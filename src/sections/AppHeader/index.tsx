@@ -15,7 +15,10 @@ export const AppHeader: FC<Props> = ({ viewer, setViewer }) => {
         LOG_OUT_USER,
         {
             onCompleted: (data) => {
-                if (data && data.logOutUser) setViewer(data.logOutUser);
+                if (data && data.logOutUser) {
+                    setViewer(data.logOutUser);
+                    sessionStorage.removeItem('token');
+                }
             },
         }
     );

@@ -17,7 +17,14 @@ export const Login: FC<Props> = ({ setViewer }) => {
         LOG_IN_USERVariables
     >(LOG_IN_USER, {
         onCompleted: (data) => {
-            if (data.logInUser) setViewer(data.logInUser);
+            if (data.logInUser) {
+                setViewer(data.logInUser);
+                if (data.logInUser.token) {
+                    sessionStorage.setItem('token', data.logInUser.token);
+                } else {
+                    sessionStorage.removeItem('token');
+                }
+            }
         },
     });
     return (
