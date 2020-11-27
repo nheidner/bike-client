@@ -15,6 +15,7 @@ import { LOG_IN_USER } from './lib/graphql/mutations/LogIn';
 import { LOG_IN_USER as LOG_IN_USERData } from './lib/graphql/mutations/LogIn/__generated__/LOG_IN_USER';
 import { LOG_IN_USERVariables } from './lib/graphql/mutations/LogIn/__generated__/LOG_IN_USER';
 import { Viewer } from './lib/types';
+import { Services } from './sections/Services';
 
 const httpLink = new HttpLink({ uri: '/api' });
 
@@ -106,7 +107,17 @@ const App = () => {
             <div>
                 <AppHeader viewer={viewer} setViewer={setViewer} />
                 <Switch>
-                    <Route exact path='/' component={Home} />
+                    <Route
+                        exact
+                        path='/'
+                        render={() => <Home viewer={viewer} />}
+                    />
+                    <Route
+                        exact
+                        path='/services/:id'
+                        render={() => <Services />}
+                    />
+
                     <Route
                         exact
                         path='/login'

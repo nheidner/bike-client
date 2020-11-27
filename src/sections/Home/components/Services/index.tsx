@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { useQuery } from '@apollo/client';
 import { SERVICES } from '../../../../lib/graphql/queries/Services';
 import {
@@ -6,8 +6,9 @@ import {
     SERVICESVariables as ServicesVariables,
     SERVICES_services_result as AllService,
 } from '../../../../lib/graphql/queries/Services/__generated__/SERVICES';
+import { Link } from 'react-router-dom';
 
-export const Services = () => {
+export const Services: FC = () => {
     const limit = 2;
     const { data, fetchMore } = useQuery<ServicesData, ServicesVariables>(
         SERVICES,
@@ -26,12 +27,12 @@ export const Services = () => {
         <div>
             {data?.services?.result.map((service, index) => {
                 return (
-                    <div key={index}>
+                    <Link to={`/services/${service.id}`} key={index}>
                         <div>{service.name}</div>
                         <div>{service.description}</div>
                         <div>{service.price}</div>
                         <hr />
-                    </div>
+                    </Link>
                 );
             })}
             {data && data.services && data.services.total > currentLength ? (

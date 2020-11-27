@@ -1,7 +1,12 @@
-import React from 'react';
+import React, { FC } from 'react';
 import { Services } from './components';
+import { Viewer } from '../../lib/types';
 
-export const Home = () => {
+interface Props {
+    viewer: Viewer;
+}
+
+export const Home: FC<Props> = ({ viewer }) => {
     return (
         <div>
             <div>Home</div>

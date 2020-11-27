@@ -4,10 +4,10 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL query operation: SERVICES
+// GraphQL query operation: SERVICE
 // ====================================================
 
-export interface SERVICES_services_result {
+export interface SERVICE_service {
   __typename: "Service";
   id: string | null;
   name: string | null;
@@ -16,17 +16,10 @@ export interface SERVICES_services_result {
   price: number | null;
 }
 
-export interface SERVICES_services {
-  __typename: "Services";
-  total: number;
-  result: SERVICES_services_result[];
+export interface SERVICE {
+  service: SERVICE_service;
 }
 
-export interface SERVICES {
-  services: SERVICES_services | null;
-}
-
-export interface SERVICESVariables {
-  offset: number;
-  limit: number;
+export interface SERVICEVariables {
+  id: string;
 }
