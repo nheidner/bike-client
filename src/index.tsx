@@ -9,10 +9,8 @@ import {
     ApolloLink,
     from,
 } from '@apollo/client';
-import { setContext } from '@apollo/client/link/context';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { Login, AppHeader, Home, Register, NotFound } from './sections';
-import * as serviceWorker from './serviceWorker';
 import { LOG_IN_USER } from './lib/graphql/mutations/LogIn';
 import { LOG_IN_USER as LOG_IN_USERData } from './lib/graphql/mutations/LogIn/__generated__/LOG_IN_USER';
 import { LOG_IN_USERVariables } from './lib/graphql/mutations/LogIn/__generated__/LOG_IN_USER';
@@ -33,26 +31,42 @@ const authMiddleware = new ApolloLink((operation, forward) => {
 });
 
 const client = new ApolloClient({
-    cache: new InMemoryCache(),
+    cache: new InMemoryCache({
+        typePolicies: {
+            Query: {
+                fields: {
+                    services: {
+                        keyArgs: false,
+                        merge(existing, incoming, { args }) {
+                            // Slicing is necessary because the existing data is
+                            // immutable, and frozen in development.
+                            let merged;
+                            if (existing) {
+                                let newResult = existing.result.slice(0);
+                                for (
+                                    let i = 0;
+                                    i < incoming.result.length;
+                                    i++
+                                ) {
+                                    if (args)
+                                        newResult[args.offset + i] =
+                                            incoming.result[i];
+                                }
+                                merged = { ...existing, result: newResult };
+                            }
+                            if (!existing) {
+                                merged = incoming;
+                            }
+
+                            return merged;
+                        },
+                    },
+                },
+            },
+        },
+    }),
     link: from([authMiddleware, httpLink]),
 });
-
-// const httpLink = createHttpLink({
-//     uri: '/api',
-// });
-
-// const authLink = setContext((_, { headers }) => {
-//     const token = sessionStorage.getItem('token');
-//     return {
-//         ...headers,
-//         'my-header': token ? `Bearer ${token}` : '',
-//     };
-// });
-
-// const client = new ApolloClient({
-//     link: authLink.concat(httpLink),
-//     cache: new InMemoryCache(),
-// });
 
 const initialViewer: Viewer = {
     id: null,
@@ -87,7 +101,6 @@ const App = () => {
         logInRef.current();
     }, []);
 
-    console.log('viewer: ', viewer);
     return (
         <Router>
             <div>
@@ -113,8 +126,3 @@ ReactDOM.render(
     </ApolloProvider>,
     document.getElementById('root')
 );
-
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();

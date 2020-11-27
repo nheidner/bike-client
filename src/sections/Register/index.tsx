@@ -15,9 +15,7 @@ export const Register = () => {
         REGISTER_USER_DATA,
         REGISTER_USERVariables
     >(REGISTER_USER);
-    // console.log('data: ', data);
-    // console.log('loading', loading);
-    // console.log('error: ', error);
+
     return (
         <div>
             <form

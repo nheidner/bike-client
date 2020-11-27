@@ -11,11 +11,11 @@ import { RegisterUserInput } from "./../../../globalTypes";
 
 export interface REGISTER_USER_registerUser {
   __typename: "User";
-  id: string | null;
-  firstName: string | null;
-  lastName: string | null;
-  email: string | null;
-  password: string | null;
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
 }
 
 export interface REGISTER_USER {
