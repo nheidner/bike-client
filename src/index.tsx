@@ -1,21 +1,23 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { FC, useRef, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import {
     ApolloClient,
     InMemoryCache,
     ApolloProvider,
-    useMutation,
     HttpLink,
     ApolloLink,
     from,
 } from '@apollo/client';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { Login, AppHeader, Home, Register, NotFound } from './sections';
+import { Services } from './sections/Service';
+import { useViewer } from './lib/utils';
+import { useMutation } from '@apollo/client';
 import { LOG_IN_USER } from './lib/graphql/mutations/LogIn';
 import { LOG_IN_USER as LOG_IN_USERData } from './lib/graphql/mutations/LogIn/__generated__/LOG_IN_USER';
 import { LOG_IN_USERVariables } from './lib/graphql/mutations/LogIn/__generated__/LOG_IN_USER';
-import { Viewer } from './lib/types';
-import { Services } from './sections/Services';
+import { Book } from './sections/Book';
+import { PrivateRoute, ViewerProvider } from './lib/components';
 
 const httpLink = new HttpLink({ uri: '/api' });
 
@@ -69,33 +71,23 @@ const client = new ApolloClient({
     link: from([authMiddleware, httpLink]),
 });
 
-const initialViewer: Viewer = {
-    id: null,
-    firstName: null,
-    lastName: null,
-    email: null,
-    token: null,
-    didRequest: false,
-};
-
 const App = () => {
-    const [viewer, setViewer] = useState(initialViewer);
-
-    const [logIn, { data, loading, error }] = useMutation<
-        LOG_IN_USERData,
-        LOG_IN_USERVariables
-    >(LOG_IN_USER, {
-        onCompleted: (data) => {
-            if (data.logInUser) {
-                setViewer(data.logInUser);
-                if (data.logInUser.token) {
-                    sessionStorage.setItem('token', data.logInUser.token);
-                } else {
-                    sessionStorage.removeItem('token');
+    const { setViewer } = useViewer();
+    const [logIn] = useMutation<LOG_IN_USERData, LOG_IN_USERVariables>(
+        LOG_IN_USER,
+        {
+            onCompleted: (data) => {
+                if (data.logInUser) {
+                    setViewer(data.logInUser);
+                    if (data.logInUser.token) {
+                        sessionStorage.setItem('token', data.logInUser.token);
+                    } else {
+                        sessionStorage.removeItem('token');
+                    }
                 }
-            }
-        },
-    });
+            },
+        }
+    );
     const logInRef = useRef(logIn);
 
     useEffect(() => {
@@ -105,25 +97,20 @@ const App = () => {
     return (
         <Router>
             <div>
-                <AppHeader viewer={viewer} setViewer={setViewer} />
+                <AppHeader />
                 <Switch>
-                    <Route
-                        exact
-                        path='/'
-                        render={() => <Home viewer={viewer} />}
-                    />
+                    <Route exact path='/' render={() => <Home />} />
                     <Route
                         exact
                         path='/services/:id'
                         render={() => <Services />}
                     />
 
-                    <Route
-                        exact
-                        path='/login'
-                        render={() => <Login setViewer={setViewer} />}
-                    />
+                    <Route exact path='/login' render={() => <Login />} />
                     <Route exact path='/register' render={() => <Register />} />
+                    <PrivateRoute path='/book/:id'>
+                        <Book />
+                    </PrivateRoute>
                     <Route component={NotFound} />
                 </Switch>
             </div>
@@ -133,7 +120,9 @@ const App = () => {
 
 ReactDOM.render(
     <ApolloProvider client={client}>
-        <App />
+        <ViewerProvider>
+            <App />
+        </ViewerProvider>
     </ApolloProvider>,
     document.getElementById('root')
 );

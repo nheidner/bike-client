@@ -11,10 +11,9 @@ export const Register = () => {
     const [password, setPassword] = useState('');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
-    const [register, { data, loading, error }] = useMutation<
-        REGISTER_USER_DATA,
-        REGISTER_USERVariables
-    >(REGISTER_USER);
+    const [register] = useMutation<REGISTER_USER_DATA, REGISTER_USERVariables>(
+        REGISTER_USER
+    );
 
     return (
         <div>

@@ -3,35 +3,45 @@ import { useMutation } from '@apollo/client';
 import { LOG_IN_USER } from '../../lib/graphql/mutations/LogIn/';
 import { LOG_IN_USER as LOG_IN_USERData } from '../../lib/graphql/mutations/LogIn/__generated__/LOG_IN_USER';
 import { LOG_IN_USERVariables } from '../../lib/graphql/mutations/LogIn/__generated__/LOG_IN_USER';
-import { Viewer } from '../../lib/types';
+import { useViewer } from '../../lib/utils';
+import { useHistory, useLocation } from 'react-router-dom';
 
-interface Props {
-    setViewer: (viewer: Viewer) => void;
-}
-
-export const Login: FC<Props> = ({ setViewer }) => {
+export const Login: FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [logIn, { data, loading, error }] = useMutation<
-        LOG_IN_USERData,
-        LOG_IN_USERVariables
-    >(LOG_IN_USER, {
-        onCompleted: (data) => {
-            if (data.logInUser) {
-                setViewer(data.logInUser);
-                if (data.logInUser.token) {
-                    sessionStorage.setItem('token', data.logInUser.token);
-                } else {
-                    sessionStorage.removeItem('token');
+    const { setViewer } = useViewer();
+
+    let history = useHistory();
+    let location = useLocation<{
+        from: { pathname: string; state: undefined | any; [more: string]: any };
+    }>();
+
+    const [logIn] = useMutation<LOG_IN_USERData, LOG_IN_USERVariables>(
+        LOG_IN_USER,
+        {
+            onCompleted: (data) => {
+                if (data.logInUser) {
+                    setViewer(data.logInUser);
+                    if (data.logInUser.token) {
+                        sessionStorage.setItem('token', data.logInUser.token);
+                    } else {
+                        sessionStorage.removeItem('token');
+                    }
+                    console.log(location);
+                    let { from } = location.state || {
+                        from: { pathname: '/' },
+                    };
+
+                    history.push(from);
                 }
-            }
-        },
-    });
+            },
+        }
+    );
     return (
         <form
             onSubmit={async (e) => {
                 e.preventDefault();
-                const data = await logIn({
+                const _ = await logIn({
                     variables: { input: { email, password, service: 'EMAIL' } },
                 });
             }}>

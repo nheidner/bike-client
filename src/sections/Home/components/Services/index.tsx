@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC } from 'react';
 import { useQuery } from '@apollo/client';
 import { SERVICES } from '../../../../lib/graphql/queries/Services';
 import {

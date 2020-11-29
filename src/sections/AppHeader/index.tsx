@@ -1,27 +1,20 @@
 import React, { FC } from 'react';
 import { Link } from 'react-router-dom';
-import { Viewer } from '../../lib/types';
+import { useViewer } from '../../lib/utils';
 import { useMutation } from '@apollo/client';
 import { LOG_OUT_USER } from '../../lib/graphql/mutations/LogOut';
 import { LOG_OUT_USER as LOG_OUT_USERDAta } from '../../lib/graphql/mutations/LogOut/__generated__/LOG_OUT_USER';
 
-interface Props {
-    setViewer: (viewer: Viewer) => void;
-    viewer: Viewer;
-}
-
-export const AppHeader: FC<Props> = ({ viewer, setViewer }) => {
-    const [logOut, { data, loading, error }] = useMutation<LOG_OUT_USERDAta>(
-        LOG_OUT_USER,
-        {
-            onCompleted: (data) => {
-                if (data && data.logOutUser) {
-                    setViewer(data.logOutUser);
-                    sessionStorage.removeItem('token');
-                }
-            },
-        }
-    );
+export const AppHeader: FC = () => {
+    const { viewer, setViewer } = useViewer();
+    const [logOut] = useMutation<LOG_OUT_USERDAta>(LOG_OUT_USER, {
+        onCompleted: (data) => {
+            if (data && data.logOutUser) {
+                setViewer(data.logOutUser);
+                sessionStorage.removeItem('token');
+            }
+        },
+    });
 
     const handleLogOut = () => {
         logOut();
