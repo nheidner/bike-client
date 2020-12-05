@@ -27,7 +27,6 @@ export const Login: FC = () => {
                     } else {
                         sessionStorage.removeItem('token');
                     }
-                    console.log(location);
                     let { from } = location.state || {
                         from: { pathname: '/' },
                     };

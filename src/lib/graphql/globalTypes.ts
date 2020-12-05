@@ -21,6 +21,14 @@ export interface RegisterUserInput {
   password: string;
 }
 
+export interface UpdateBookingInput {
+  date?: string | null;
+  time?: string | null;
+  services?: (string | null)[] | null;
+  wallet?: string | null;
+  isMade?: boolean | null;
+}
+
 //==============================================================
 // END Enums and Input Objects
 //==============================================================

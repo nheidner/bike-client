@@ -23,7 +23,7 @@ export interface SERVICES_services {
 }
 
 export interface SERVICES {
-  services: SERVICES_services | null;
+  services: SERVICES_services;
 }
 
 export interface SERVICESVariables {

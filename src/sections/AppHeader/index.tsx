@@ -1,25 +1,28 @@
 import React, { FC } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { useViewer } from '../../lib/utils';
 import { useMutation } from '@apollo/client';
 import { LOG_OUT_USER } from '../../lib/graphql/mutations/LogOut';
 import { LOG_OUT_USER as LOG_OUT_USERDAta } from '../../lib/graphql/mutations/LogOut/__generated__/LOG_OUT_USER';
+import { client } from '../../lib/graphql/apollo/client';
 
 export const AppHeader: FC = () => {
     const { viewer, setViewer } = useViewer();
+    const history = useHistory();
     const [logOut] = useMutation<LOG_OUT_USERDAta>(LOG_OUT_USER, {
-        onCompleted: (data) => {
+        onCompleted: async (data) => {
             if (data && data.logOutUser) {
-                setViewer(data.logOutUser);
+                await client.cache.reset();
                 sessionStorage.removeItem('token');
+                history.push('/');
+                setViewer(data.logOutUser);
             }
         },
     });
 
-    const handleLogOut = () => {
+    const handleLogOut = async () => {
         logOut();
     };
-
     return (
         <div>
             <div>

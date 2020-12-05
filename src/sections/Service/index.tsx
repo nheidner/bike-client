@@ -15,7 +15,6 @@ export const Services = () => {
     });
 
     if (error) {
-        console.log(error.graphQLErrors[0]);
         return (
             <div>
                 <h1>Error</h1>
@@ -35,7 +34,7 @@ export const Services = () => {
             <div>{service?.description}</div>
             <Link
                 to={{
-                    pathname: `/book/${service?.id}`,
+                    pathname: `/booking/${service?.id}`,
                     state: undefined,
                 }}>
                 Book
