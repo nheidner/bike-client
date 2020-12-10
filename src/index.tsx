@@ -9,7 +9,7 @@ import { useMutation } from '@apollo/client';
 import { LOG_IN_USER } from './lib/graphql/mutations/LogIn';
 import { LOG_IN_USER as LOG_IN_USERData } from './lib/graphql/mutations/LogIn/__generated__/LOG_IN_USER';
 import { LOG_IN_USERVariables } from './lib/graphql/mutations/LogIn/__generated__/LOG_IN_USER';
-import { Booking } from './sections/Booking';
+import { NewBooking } from './sections/NewBooking';
 import { PrivateRoute, ViewerProvider } from './lib/components';
 import { client } from './lib/graphql/apollo';
 
@@ -51,8 +51,8 @@ const App = () => {
 
                     <Route exact path='/login' render={() => <Login />} />
                     <Route exact path='/register' render={() => <Register />} />
-                    <PrivateRoute path='/booking/:serviceId'>
-                        <Booking />
+                    <PrivateRoute path='/newBooking/:serviceId'>
+                        <NewBooking />
                     </PrivateRoute>
                     <Route component={NotFound} />
                 </Switch>

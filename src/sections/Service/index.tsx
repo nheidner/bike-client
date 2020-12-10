@@ -34,7 +34,7 @@ export const Services = () => {
             <div>{service?.description}</div>
             <Link
                 to={{
-                    pathname: `/booking/${service?.id}`,
+                    pathname: `/newBooking/${service?.id}`,
                     state: undefined,
                 }}>
                 Book

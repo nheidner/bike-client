@@ -1,4 +1,9 @@
-import { useMutation, useQuery } from '@apollo/client';
+import { UPDATE_NEW_BOOKING_ADDRESS } from '../../../lib/graphql/mutations/UpdateNewBookingAddress';
+import {
+    UPDATE_NEW_BOOKING_ADDRESS as UpdateNewBookingAddressData,
+    UPDATE_NEW_BOOKING_ADDRESSVariables as UpdateNewBookingAddressVariables,
+} from '../../../lib/graphql/mutations/UpdateNewBookingAddress/__generated__/UPDATE_NEW_BOOKING_ADDRESS';
+import { useMutation } from '@apollo/client';
 import React, {
     useEffect,
     useState,
@@ -6,17 +11,7 @@ import React, {
     MutableRefObject,
     FC,
 } from 'react';
-import { useParams } from 'react-router-dom';
-import { BOOKING } from '../../lib/graphql/queries/Booking';
-import {
-    BOOKING as BookingData,
-    BOOKINGVariables as BookingVariables,
-} from '../../lib/graphql/queries/Booking/__generated__/BOOKING';
-import { UPDATE_BOOKING } from '../../lib/graphql/mutations/UpdateBooking';
-import {
-    UPDATE_BOOKING as UpdateBookingData,
-    UPDATE_BOOKINGVariables as UpdateBookingVariables,
-} from '../../lib/graphql/mutations/UpdateBooking/__generated__/UPDATE_BOOKING';
+import { useHistory, useLocation, useRouteMatch } from 'react-router-dom';
 
 interface AddressFieldsActions {
     setFirstLine: (query: string) => void;
@@ -103,13 +98,22 @@ const handlePlaceChanged = (addressFieldsActions: AddressFieldsActions) => {
     }
 };
 
-const AddressForm: FC = () => {
+interface Props {
+    bookingId: string;
+}
+
+export const AddressForm: FC<Props> = ({ bookingId }) => {
     const [fullName, setFullName] = useState('');
     const [firstLine, setFirstLine] = useState('');
     const [secondLine, setSecondLine] = useState('');
     const [postalCode, setPostalCode] = useState('');
     const [city, setCity] = useState('');
     const autoCompleteRef = useRef(null);
+
+    const [updateBookingAddress] = useMutation<
+        UpdateNewBookingAddressData,
+        UpdateNewBookingAddressVariables
+    >(UPDATE_NEW_BOOKING_ADDRESS);
 
     useEffect(() => {
         loadScript(
@@ -126,8 +130,30 @@ const AddressForm: FC = () => {
         );
     }, []);
 
+    const history = useHistory();
+    const { pathname } = useLocation();
+
     return (
-        <div>
+        <form
+            onSubmit={async (e) => {
+                e.preventDefault();
+                try {
+                    const { data } = await updateBookingAddress({
+                        variables: {
+                            input: {
+                                fullName,
+                                firstLine,
+                                secondLine,
+                                postalCode,
+                                city,
+                            },
+                        },
+                    });
+                    history.push(pathname + '/pickDateAndTime');
+                } catch (error) {
+                    console.log('error: ', error);
+                }
+            }}>
             <input
                 onChange={(event) => setFullName(event.target.value)}
                 placeholder='Vor- und Nachname'
@@ -154,54 +180,7 @@ const AddressForm: FC = () => {
                 placeholder='Stadt'
                 value={city}
             />
-        </div>
-    );
-};
-
-export const Booking = () => {
-    const [date, setDate] = useState('');
-    const params = useParams<{ serviceId: string }>();
-    const { data } = useQuery<BookingData, BookingVariables>(BOOKING, {
-        variables: { serviceId: params.serviceId },
-    });
-
-    const [updateBooking] = useMutation<
-        UpdateBookingData,
-        UpdateBookingVariables
-    >(UPDATE_BOOKING);
-
-    if (!data) {
-        return <div>no data</div>;
-    }
-
-    return (
-        <div>
-            <h1>Book {data.booking.services[0].name}</h1>
-            <div>{data.booking.date}</div>
-            <AddressForm />
-            <form
-                onSubmit={async (e) => {
-                    e.preventDefault();
-                    try {
-                        await updateBooking({
-                            variables: {
-                                input: {
-                                    date,
-                                    services: [params.serviceId],
-                                },
-                            },
-                        });
-                    } catch (error) {
-                        console.log('error: ', error);
-                    }
-                }}>
-                <input
-                    value={date}
-                    placeholder='change date'
-                    onChange={(e) => setDate(e.target.value)}
-                />
-                <button type='submit'>change Booking</button>
-            </form>
-        </div>
+            <button type='submit'>update address</button>
+        </form>
     );
 };

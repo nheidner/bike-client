@@ -14,6 +14,10 @@ export interface LogInInput {
   code?: string | null;
 }
 
+export interface NewBookingInput {
+  serviceId?: string | null;
+}
+
 export interface RegisterUserInput {
   firstName: string;
   lastName: string;
@@ -21,12 +25,17 @@ export interface RegisterUserInput {
   password: string;
 }
 
-export interface UpdateBookingInput {
-  date?: string | null;
-  time?: string | null;
-  services?: (string | null)[] | null;
-  wallet?: string | null;
-  isMade?: boolean | null;
+export interface UpdateNewBookingAddressInput {
+  fullName: string;
+  firstLine: string;
+  secondLine?: string | null;
+  postalCode: string;
+  city: string;
+}
+
+export interface UpdateNewBookingDateInput {
+  from?: any | null;
+  to?: any | null;
 }
 
 //==============================================================
